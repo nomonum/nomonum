@@ -1,0 +1,13 @@
+{% assign entries = include.entries %}
+{% if entries.size == 0 %}
+  <p class="empty">Nothing here yet.</p>
+{% else %}
+  <ul class="index-list">
+    {% for entry in entries %}
+      <li class="index-row">
+        <a class="index-title" href="{{ entry.url | relative_url }}">{{ entry.title | default: entry.caption | default: "Untitled" }}</a>
+        <span class="index-date">{{ entry.date | date: "%d %b %Y" }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

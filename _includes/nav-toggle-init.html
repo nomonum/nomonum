@@ -1,0 +1,14 @@
+<script>
+  // Restores the reader's saved nav-hidden choice before first paint, so
+  // there's no flash of the sidebar appearing and then disappearing.
+  // Must run early in <head>, as a plain synchronous script (not
+  // deferred) — same pattern as theme-init.html, just for the sidebar's
+  // visibility instead of the color theme.
+  (function () {
+    try {
+      if (localStorage.getItem('nomonum-nav-hidden') === 'true') {
+        document.documentElement.classList.add('nav-hidden');
+      }
+    } catch (e) {}
+  })();
+</script>

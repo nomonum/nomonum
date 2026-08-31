@@ -1,0 +1,11 @@
+---
+layout: default
+---
+<div class="page-intro">
+  {{ content }}
+</div>
+
+{% assign entries = site.posts | sort: "date" | reverse %}
+<h1 class="index-heading">Latest</h1>
+<p class="index-count">Showing {{ entries.size }} item{% unless entries.size == 1 %}s{% endunless %}</p>
+{% include entry-list.html entries=entries %}

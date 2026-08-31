@@ -1,0 +1,32 @@
+<aside class="site-nav">
+  <div class="nav-brand">
+    <a href="{{ '/' | relative_url }}">{{ site.title }}</a>
+    {% if site.tagline %}<div class="nav-tagline">{{ site.tagline }}</div>{% endif %}
+  </div>
+  <nav class="nav-categories">
+    <ul>
+      {% for cat in site.nav_categories %}
+        {% assign cat_items = site.posts | where: "category", cat.slug | sort: "date" | reverse %}
+        {% assign is_current = false %}
+        {% if page.category == cat.slug %}
+          {% assign is_current = true %}
+        {% endif %}
+        <li{% if is_current %} class="nav-current"{% endif %}>
+          <a href="{{ '/' | append: cat.slug | append: '-index/' | relative_url }}">{{ cat.title }}</a>
+          {% if cat_items.size > 0 %}
+            <ul class="nav-preview">
+              {% for item in cat_items limit: site.nav_preview_count %}
+                <li><a href="{{ item.url | relative_url }}">{{ item.title | default: item.caption | default: "Untitled" | truncate: 34 }}</a></li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <ul class="nav-utility">
+      <li{% if page.url == '/latest/' %} class="nav-current"{% endif %}><a href="{{ '/latest/' | relative_url }}">Latest</a></li>
+      <li{% if page.url == '/archive/' %} class="nav-current"{% endif %}><a href="{{ '/archive/' | relative_url }}">Archive</a></li>
+      <li{% if page.url == '/library/' %} class="nav-current"{% endif %}><a href="{{ '/library/' | relative_url }}">Library</a></li>
+    </ul>
+  </nav>
+</aside>

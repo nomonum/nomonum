@@ -1,0 +1,26 @@
+{% assign cat_items = site.posts | where: "category", page.category | sort: "date" | reverse %}
+{% assign newer = nil %}
+{% assign older = nil %}
+{% assign found = false %}
+{% assign prior_item = nil %}
+{% for item in cat_items %}
+  {% if item.url == page.url %}
+    {% assign found = true %}
+    {% assign newer = prior_item %}
+  {% elsif found and older == nil %}
+    {% assign older = item %}
+  {% endif %}
+  {% assign prior_item = item %}
+{% endfor %}
+{% if older or newer %}
+  <nav class="prev-next">
+    {% if newer %}
+      <a class="prev-next-link prev-next-newer" href="{{ newer.url | relative_url }}">&laquo; {{ newer.title | default: newer.caption | default: "Untitled" }}</a>
+    {% else %}
+      <span></span>
+    {% endif %}
+    {% if older %}
+      <a class="prev-next-link prev-next-older" href="{{ older.url | relative_url }}">{{ older.title | default: older.caption | default: "Untitled" }} &raquo;</a>
+    {% endif %}
+  </nav>
+{% endif %}

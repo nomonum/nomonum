@@ -1,0 +1,14 @@
+<script>
+  // Restores the reader's saved day/night choice before first paint, so
+  // there's no flash of the wrong theme. Must run early in <head>, as a
+  // plain synchronous script (not deferred). If nothing is saved, the
+  // CSS media query in style.css falls back to the system preference.
+  (function () {
+    try {
+      var stored = localStorage.getItem('nomonum-theme');
+      if (stored === 'dark' || stored === 'light') {
+        document.documentElement.setAttribute('data-theme', stored);
+      }
+    } catch (e) {}
+  })();
+</script>

@@ -1,0 +1,12 @@
+---
+title: "Welcome"
+category: notes
+---
+
+This is the first article on nomonum.
+
+Articles like this one live in the `_posts` folder — name each file `YYYY-MM-DD-your-title.markdown` and Jekyll takes care of the rest. Write in plain Markdown: headings, links, lists, and images all work as you'd expect.
+
+Photos live separately, in `_photos`, and show up full-width on their own page, and alongside articles in whatever category they share.
+
+![junk.JPG](/assets/images/junk.JPG)

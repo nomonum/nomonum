@@ -1,0 +1,15 @@
+---
+layout: default
+---
+{% assign entries = site.posts | sort: "date" | reverse %}
+{% if page.limit %}
+  {% assign entries = entries | slice: 0, page.limit %}
+{% endif %}
+<h1 class="index-heading">{{ page.index_heading | default: page.title }}</h1>
+<p class="index-count">Showing {{ entries.size }} item{% unless entries.size == 1 %}s{% endunless %}, full posts, most recent first</p>
+
+{% for post in entries %}
+  {% assign post_uid = post.url | slugify %}
+  {% include post-body.html post=post uid=post_uid show_prev_next=false %}
+  {% unless forloop.last %}<hr class="feed-divider">{% endunless %}
+{% endfor %}

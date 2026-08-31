@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% include theme-init.html %}
+  <title>{{ site.title }}</title>
+  {% if site.description %}<meta name="description" content="{{ site.description }}">{% endif %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
+</head>
+<body class="landing-body">
+  {% include theme-toggle.html %}
+  <div class="landing">
+    <h1 class="landing-title">{{ site.title }}</h1>
+    <nav class="landing-nav">
+      <ul>
+        {% for cat in site.nav_categories %}
+          <li><a href="{{ '/' | append: cat.slug | append: '-index/' | relative_url }}">{{ cat.title }}</a></li>
+        {% endfor %}
+        <li><a href="{{ '/latest/' | relative_url }}">Latest</a></li>
+        <li><a href="{{ '/archive/' | relative_url }}">Archive</a></li>
+        <li><a href="{{ '/library/' | relative_url }}">Library</a></li>
+      </ul>
+    </nav>
+    <img class="landing-cover" src="{{ '/assets/images/cover.png' | relative_url }}" alt="{{ site.title }}">
+  </div>
+</body>
+</html>

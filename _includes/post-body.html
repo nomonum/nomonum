@@ -1,0 +1,171 @@
+{% comment %}
+  Renders one post in full: header, hero image, body text, and (if the
+  post has any) its notes — shown TWICE. A sidenotes column beside the
+  body on wide screens, positioned per-note exactly as before, and a
+  second, real footnotes list at the bottom of the post. The sidenotes
+  copy is display-only: its <li> ids are prefixed "sidefn:" instead of
+  "fn:", so the in-text marker's link (href="#fn:...") always jumps to
+  the bottom copy, never the sidenotes column. On narrow screens the
+  sidenotes copy is hidden entirely (CSS) and the bottom list is the
+  only one visible, so nothing doubles up there.
+  Shared by _layouts/post.html (one post, its own page) and
+  _layouts/feed.html (several posts stacked on one page, e.g. /latest/).
+
+  Required params:
+    post - the post/page object to render
+    uid  - a string unique to this post ON THIS PAGE. Needed because
+           kramdown bakes footnote ids (fn:1, fnref:1, ...) directly into
+           each post's rendered HTML, numbered from 1 within that post
+           alone — fine for a post on its own page, but if two posts
+           that both use [^1] ever ended up stacked on the same page
+           unchanged, they'd collide (duplicate ids, broken note links,
+           broken alignment script). uid is spliced into those ids to
+           keep every post's notes namespaced to itself.
+
+  Optional params:
+    show_prev_next - if true, wraps the post with {% include prev-next.html %}
+                      (which reads the *current page* for its "older/newer
+                      in this category" links — correct on a post's own
+                      page, not meaningful stacked in a feed of mixed
+                      categories, so the feed passes false/omits it).
+{% endcomment %}
+{% assign p = include.post %}
+{% assign uid = include.uid %}
+
+<article class="wrap wrap--wide" id="post-{{ uid }}">
+  {% if include.show_prev_next %}
+    {% include prev-next.html %}
+  {% endif %}
+  {% assign category_title = p.category %}
+  {% for cat in site.nav_categories %}
+    {% if cat.slug == p.category %}
+      {% assign category_title = cat.title %}
+    {% endif %}
+  {% endfor %}
+  <header class="article-header">
+    <div class="article-date">
+      {{ p.date | date: "%d %b %Y" }}
+      {% if p.category %}
+        <span class="article-category">&middot; <a href="{{ '/' | append: p.category | append: '-index/' | relative_url }}">{{ category_title }}</a></span>
+      {% endif %}
+    </div>
+    <h1 class="article-title"><a href="{{ p.url | relative_url }}">{{ p.title | default: p.caption | default: "Untitled" }}</a></h1>
+    {% if p.byline %}<p class="article-byline">{{ p.byline }}</p>{% endif %}
+  </header>
+  {% if p.image %}
+    <img class="post-hero" src="{{ p.image | relative_url }}" alt="{{ p.caption | default: p.title | escape }}">
+    {% if p.caption %}<p class="post-hero-caption">{{ p.caption }}</p>{% endif %}
+  {% endif %}
+  {% assign fnref_id_to = 'id="fnref:' | append: uid | append: '-' %}
+  {% assign fnref_href_to = 'href="#fnref:' | append: uid | append: '-' %}
+  {% assign fn_id_to = 'id="fn:' | append: uid | append: '-' %}
+  {% assign fn_href_to = 'href="#fn:' | append: uid | append: '-' %}
+  {% assign safe_content = p.content
+       | replace: 'id="fnref:', fnref_id_to
+       | replace: 'href="#fnref:', fnref_href_to
+       | replace: 'id="fn:', fn_id_to
+       | replace: 'href="#fn:', fn_href_to %}
+  {% assign content_parts = safe_content | split: '<div class="footnotes"' %}
+  {% assign sidenote_footnotes = content_parts[1] | replace: 'id="fn:', 'id="sidefn:' %}
+  <div class="article-content{% if content_parts.size > 1 %} has-sidenotes{% endif %}">
+    <div class="content-main">
+      {{ content_parts[0] }}
+    </div>
+    {% if content_parts.size > 1 %}
+      <div class="footnotes sidenotes-copy"{{ sidenote_footnotes }}
+    {% endif %}
+  </div>
+  {% if content_parts.size > 1 %}
+    <script>
+      // Positions the sidenotes copy beside its own reference marker in
+      // the text — true margin notes — purely for display. Its <li> ids
+      // are prefixed "sidefn:" (see above), not "fn:", so this never
+      // touches the real footnotes list below, which is what the
+      // in-text marker link actually points to.
+      // Scoped to THIS post's own <article> (by its uid'd id), so
+      // running this once per post in a feed doesn't just keep
+      // re-positioning the first post's notes.
+      (function () {
+        var mq = window.matchMedia('(min-width: 901px)');
+        var article = document.getElementById('post-{{ uid }}');
+        if (!article) return;
+        var contentMain = article.querySelector('.content-main');
+        var footnotes = article.querySelector('.sidenotes-copy');
+        var list = footnotes ? footnotes.querySelector('ol') : null;
+        if (!contentMain || !footnotes || !list) return;
+
+        var items = Array.prototype.slice.call(list.children).filter(function (li) {
+          return li.id && li.id.indexOf('sidefn:') === 0;
+        });
+        if (!items.length) return;
+
+        var GAP = 16; // px, minimum space between two stacked notes
+
+        function reset() {
+          items.forEach(function (li) {
+            li.style.position = '';
+            li.style.top = '';
+            li.style.left = '';
+            li.style.right = '';
+          });
+          list.style.minHeight = '';
+        }
+
+        function align() {
+          reset();
+          if (!mq.matches) return;
+
+          var containerTop = list.getBoundingClientRect().top + window.scrollY;
+          var lastBottom = 0;
+
+          items.forEach(function (li) {
+            var suffix = li.id.slice(7); // strip the "sidefn:" prefix
+            var marker = document.getElementById('fnref:' + suffix);
+            var naturalTop = marker
+              ? marker.getBoundingClientRect().top + window.scrollY - containerTop
+              : lastBottom;
+            var top = Math.max(naturalTop, lastBottom);
+
+            li.style.position = 'absolute';
+            li.style.left = '0';
+            li.style.right = '0';
+            li.style.top = top + 'px';
+
+            lastBottom = top + li.offsetHeight + GAP;
+          });
+
+          list.style.minHeight = lastBottom + 'px';
+        }
+
+        var pending = false;
+        function scheduleAlign() {
+          if (pending) return;
+          pending = true;
+          requestAnimationFrame(function () {
+            pending = false;
+            align();
+          });
+        }
+
+        align();
+        window.addEventListener('resize', scheduleAlign);
+        window.addEventListener('load', scheduleAlign);
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(scheduleAlign);
+        }
+
+        if (window.ResizeObserver) {
+          new ResizeObserver(scheduleAlign).observe(contentMain);
+        } else {
+          Array.prototype.forEach.call(article.querySelectorAll('img'), function (img) {
+            if (!img.complete) img.addEventListener('load', scheduleAlign, { once: true });
+          });
+        }
+      })();
+    </script>
+    <div class="footnotes footnotes-bottom"{{ content_parts[1] }}
+  {% endif %}
+  {% if include.show_prev_next %}
+    {% include prev-next.html %}
+  {% endif %}
+</article>

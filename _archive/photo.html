@@ -1,0 +1,12 @@
+---
+layout: default
+---
+<div class="photo-page">
+  <img src="{{ page.image | relative_url }}" alt="{{ page.caption | default: page.title | escape }}">
+  <div class="photo-meta wrap">
+    {% include prev-next.html %}
+    {% if page.caption %}<p class="photo-caption">{{ page.caption }}</p>{% endif %}
+    <div class="photo-date">{{ page.date | date: "%d %b %Y" }}</div>
+    {{ content }}
+  </div>
+</div>

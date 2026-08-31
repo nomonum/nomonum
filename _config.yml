@@ -1,0 +1,54 @@
+# Site settings
+title: nomonum
+tagline: "Photos and short writing."
+description: "Photos and short writing."
+url: "https://nomonum.com"
+baseurl: ""
+
+author: ""
+email: ""
+
+# The sidebar navigation and the category index pages are driven from this
+# list. Renaming a category is a two-step edit: change the "title" here
+# (this is the only place the display name lives), and rename the matching
+# *-index.markdown file's "category" front matter value if you also change
+# the slug. Reorder this list to reorder the sidebar.
+nav_categories:
+  - slug: informatics
+    title: Informatics
+  - slug: transmissions
+    title: Transmissions
+  - slug: notes
+    title: Notes
+  - slug: recipes
+    title: Recipes
+
+# How many recent items to preview under each category in the sidebar.
+nav_preview_count: 3
+
+# Permalinks
+permalink: /:year/:month/:day/:title/
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      category: "notes"
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor
+  - node_modules

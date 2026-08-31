@@ -1,0 +1,116 @@
+---
+layout: default
+---
+{% if page.category %}
+  {% assign entries = site.posts | where: "category", page.category | sort: "date" | reverse %}
+{% else %}
+  {% assign entries = site.posts | sort: "date" | reverse %}
+{% endif %}
+{% if page.limit %}
+  {% assign entries = entries | slice: 0, page.limit %}
+{% endif %}
+<h1 class="index-heading">{{ page.index_heading | default: page.title }}</h1>
+<p class="index-count">Showing {{ entries.size }} item{% unless entries.size == 1 %}s{% endunless %}</p>
+{% if page.scroll_list %}
+  <div class="index-scroll">
+    {% include entry-list.html entries=entries %}
+  </div>
+{% else %}
+  {% include entry-list.html entries=entries %}
+{% endif %}
+
+{% if page.show_photos %}
+  {% assign photo_files = site.static_files | where_exp: "f", "f.path contains '/assets/images/'" %}
+  {% assign photo_files = photo_files | where_exp: "f", "f.extname == '.jpg' or f.extname == '.JPG' or f.extname == '.jpeg' or f.extname == '.JPEG' or f.extname == '.png' or f.extname == '.PNG' or f.extname == '.gif' or f.extname == '.GIF'" %}
+  {% assign photo_files = photo_files | where_exp: "f", "f.name != 'placeholder.jpg' and f.name != 'cover.png'" %}
+  {% assign photo_files = photo_files | sort: "modified_time" | reverse %}
+  {% assign photo_groups = photo_files | group_by_exp: "f", "f.modified_time | date: '%Y'" %}
+  {% assign photo_groups = photo_groups | sort: "name" | reverse %}
+
+  <h2 class="index-subheading">Photos</h2>
+  <p class="index-count">Showing {{ photo_files.size }} item{% unless photo_files.size == 1 %}s{% endunless %}, by year</p>
+
+  {% for group in photo_groups %}
+    <details class="photo-year">
+      <summary>{{ group.name }} <span class="photo-year-count">({{ group.items.size }})</span></summary>
+      <div class="photo-grid">
+        {% for f in group.items %}
+          <a class="photo-grid-item" href="{{ f.path | relative_url }}">
+            <img src="{{ f.path | relative_url }}" alt="{{ f.name }}" loading="lazy">
+          </a>
+        {% endfor %}
+      </div>
+    </details>
+  {% endfor %}
+
+  <div class="lightbox" id="photo-lightbox" hidden>
+    <button type="button" class="lightbox-close" aria-label="Close">&times;</button>
+    <img class="lightbox-image" src="" alt="">
+  </div>
+
+  <script>
+    // Opens a clicked thumbnail in an overlay on this same page instead
+    // of navigating to the raw image file. Falls back to a normal link
+    // (same-page navigation to the image) if JS doesn't run.
+    (function () {
+      var lightbox = document.getElementById('photo-lightbox');
+      var lightboxImg = lightbox ? lightbox.querySelector('.lightbox-image') : null;
+      var closeBtn = lightbox ? lightbox.querySelector('.lightbox-close') : null;
+      var links = document.querySelectorAll('.photo-grid-item');
+      if (!lightbox || !lightboxImg || !links.length) return;
+
+      function openLightbox(src, alt) {
+        lightboxImg.src = src;
+        lightboxImg.alt = alt || '';
+        lightbox.hidden = false;
+      }
+
+      function closeLightbox() {
+        lightbox.hidden = true;
+        lightboxImg.src = '';
+      }
+
+      links.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          var img = link.querySelector('img');
+          openLightbox(link.getAttribute('href'), img ? img.getAttribute('alt') : '');
+        });
+      });
+
+      closeBtn.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !lightbox.hidden) closeLightbox();
+      });
+    })();
+  </script>
+
+  <script>
+    // Lines up the rule above this "Photos" heading with the rule above
+    // "Latest" in the sidebar (.nav-utility). Their natural positions
+    // depend on independent, variable-height content (how many posts
+    // are in the archive list vs. how tall the sidebar is), so a fixed
+    // CSS margin can't track both — this nudges the heading down to
+    // meet the sidebar's line, never up past its own natural spacing.
+    (function () {
+      var navRule = document.querySelector('.nav-utility');
+      var heading = document.querySelector('.index-subheading');
+      if (!navRule || !heading) return;
+
+      function align() {
+        heading.style.marginTop = '';
+        var diff = navRule.getBoundingClientRect().top - heading.getBoundingClientRect().top;
+        if (diff > 0) {
+          var base = parseFloat(getComputedStyle(heading).marginTop) || 0;
+          heading.style.marginTop = (base + diff) + 'px';
+        }
+      }
+
+      align();
+      window.addEventListener('resize', align);
+    })();
+  </script>
+{% endif %}

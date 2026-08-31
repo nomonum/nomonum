@@ -1,0 +1,29 @@
+<button type="button" id="nav-toggle" class="nav-toggle" aria-label="Hide navigation">&laquo;</button>
+<script>
+  (function () {
+    var btn = document.getElementById('nav-toggle');
+    if (!btn) return;
+    var root = document.documentElement;
+
+    function isHidden() {
+      return root.classList.contains('nav-hidden');
+    }
+
+    function updateButton() {
+      var hidden = isHidden();
+      btn.innerHTML = hidden ? '&raquo;' : '&laquo;';
+      btn.setAttribute('aria-label', hidden ? 'Show navigation' : 'Hide navigation');
+    }
+
+    btn.addEventListener('click', function () {
+      var next = !isHidden();
+      root.classList.toggle('nav-hidden', next);
+      try {
+        localStorage.setItem('nomonum-nav-hidden', next ? 'true' : 'false');
+      } catch (e) {}
+      updateButton();
+    });
+
+    updateButton();
+  })();
+</script>

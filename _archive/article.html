@@ -1,0 +1,15 @@
+---
+layout: default
+---
+<article class="wrap wrap--wide">
+  {% include prev-next.html %}
+  <header class="article-header">
+    <div class="article-date">{{ page.date | date: "%d %b %Y" }}</div>
+    <h1 class="article-title">{{ page.title }}</h1>
+    {% if page.byline %}<p class="article-byline">{{ page.byline }}</p>{% endif %}
+  </header>
+  <div class="article-content">
+    {{ content }}
+  </div>
+  {% include prev-next.html %}
+</article>

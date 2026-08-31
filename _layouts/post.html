@@ -1,0 +1,5 @@
+---
+layout: default
+---
+{% assign post_uid = page.url | slugify %}
+{% include post-body.html post=page uid=post_uid show_prev_next=true %}

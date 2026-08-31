@@ -1,0 +1,1111 @@
+/* ---------------------------------------------------
+   nomonum — directory-style theme
+   Serif, small caps, thin rules. Plain CSS, no framework.
+--------------------------------------------------- */
+
+:root {
+  --ink: #1c1b19;
+  --muted: #8c887f;
+  --line: #dbd7cd;
+  --bg: #ffffff;
+  --link: #1a5fb4;
+  --link-hover: #0b3d91;
+  --serif: "EB Garamond", Georgia, "Times New Roman", serif;
+  --max: 700px;
+  --max-wide: 1200px;
+}
+
+/* Night mode — same warm, monochrome palette, inverted. Applied either
+   by system preference (prefers-color-scheme) or by the reader's own
+   choice via the toggle button (_includes/theme-toggle.html), which
+   sets data-theme on <html> and overrides the system preference either
+   way. See _includes/theme-init.html for how that choice is restored
+   on load without a flash of the wrong theme. */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #ece8e0;
+    --muted: #94897a;
+    --line: #37332c;
+    --bg: #000000;
+    --link: #6ea8fe;
+    --link-hover: #9dc1ff;
+  }
+}
+
+:root[data-theme="dark"] {
+  --ink: #ece8e0;
+  --muted: #94897a;
+  --line: #37332c;
+  --bg: #000000;
+  --link: #6ea8fe;
+  --link-hover: #9dc1ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Sets the baseline every `rem` size in this file scales from (the
+   browser default is 16px) — bumping it here nudges every rem-sized
+   heading, label, date, caption, etc. up slightly along with the body
+   text below, instead of just the body text alone. */
+html {
+  font-size: 17px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+}
+
+a:hover {
+  border-bottom-color: var(--ink);
+}
+
+/* Day / night toggle — fixed top-right on every page (see
+   _includes/theme-toggle.html), so it's reachable from the landing
+   page too, which doesn't use the sidebar shell. */
+
+.theme-toggle {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.5rem;
+  z-index: 500;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--ink);
+}
+
+/* Nav hide/show toggle — fixed top-left (mirrors .theme-toggle's
+   top-right position), so it stays reachable whether or not the
+   sidebar is currently visible. See _includes/nav-toggle.html and
+   _includes/nav-toggle-init.html. Not shown on the landing page,
+   which has no sidebar to hide (that layout never includes
+   nav-toggle.html). */
+
+.nav-toggle {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.5rem;
+  z-index: 500;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.nav-toggle:hover {
+  border-color: var(--ink);
+}
+
+.wrap {
+  max-width: var(--max);
+}
+
+.wrap--wide {
+  max-width: var(--max-wide);
+}
+
+/* ---------------------------------------------------
+   Site shell: sidebar + main
+--------------------------------------------------- */
+
+.site-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 5rem;
+}
+
+.site-nav {
+  flex: 0 0 190px;
+}
+
+.site-main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Hides the sidebar when the reader has toggled it off (see
+   _includes/nav-toggle.html, and _includes/nav-toggle-init.html for
+   how the choice survives a reload without flashing back in first).
+   .site-nav and .site-main are flex children of .site-shell, so
+   removing .site-nav from layout is all that's needed for .site-main
+   to expand into the freed width on its own — flex gap doesn't add
+   space for a display:none item either, so no dangling gap remains. */
+html.nav-hidden .site-nav {
+  display: none;
+}
+
+/* Rather than let .site-main stretch to fill the freed width (which
+   left everything inside it — hero image, text, sidenotes grid —
+   pinned to the left with empty space on the right), cap it back to
+   the exact width it already had with the sidebar showing: shell
+   width minus the sidebar's own flex-basis and the gap beside it.
+   Auto margins then center that same-sized column in the wider
+   shell. Nothing inside .site-main changes size or position relative
+   to its own column, so the format — hero image, text, sidenotes,
+   all of it — stays exactly as it was; only the column as a whole
+   moves to the middle of the page. Scoped to the same breakpoint as
+   the sidebar layout itself, since below it the sidebar already
+   stacks full-width above the content instead of sitting beside it. */
+@media (min-width: 781px) {
+  html.nav-hidden .site-main {
+    max-width: calc(100% - 190px - 3rem);
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Keep the sidebar in view while the (usually taller) main column
+   scrolls past it — same trick as the sticky sidenotes column: the
+   flex container (.site-shell) is as tall as its tallest child, so
+   .site-nav has room to stick and travel within it. Scoped to the
+   same breakpoint as the row layout itself below, so it never applies
+   once the sidebar stacks above the main content on narrow screens. */
+@media (min-width: 781px) {
+  .site-nav {
+    position: sticky;
+    top: 2.5rem;
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 780px) {
+  .site-shell {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 1.75rem 1.25rem 3rem;
+  }
+
+  .site-nav {
+    flex-basis: auto;
+  }
+}
+
+/* Nav brand */
+
+.nav-brand a {
+  font-variant: small-caps;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  font-size: 1.6rem;
+  border: none;
+}
+
+.nav-tagline {
+  font-style: italic;
+  color: var(--ink);
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+}
+
+/* Nav categories */
+
+.nav-categories {
+  margin-top: 2rem;
+}
+
+.nav-categories > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Extra breathing room between one category's block (its link plus its
+   preview posts) and the next — this is what now keeps them reading as
+   distinct groups, since .nav-preview no longer has a vertical rule of
+   its own (removed: it clashed with the horizontal rules further down
+   the page, e.g. at the end of a post, whenever the sticky sidebar and
+   the main content lined up while scrolling). */
+.nav-categories > ul > li {
+  margin-bottom: 1.5rem;
+}
+
+.nav-categories > ul > li > a {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: none;
+}
+
+.nav-categories > ul > li > a:hover {
+  border-bottom: 1px solid var(--ink);
+}
+
+/* Marks whichever category (or Latest/Archive/Library) the current
+   page is — set in _includes/nav.html by comparing page.category or
+   page.url against each link. Now that every category link is bold,
+   weight alone can't tell current from the rest, so this adds the
+   site's link blue plus an underline — a louder, unambiguous cue.
+   Written with ".nav-categories"/".nav-utility" repeated so it beats
+   those sections' own "border: none" on specificity, rather than
+   relying on rule order (which alone wouldn't be enough for the
+   nav-categories links — that rule is more specific to begin with). */
+.nav-categories > ul > li.nav-current > a,
+.nav-utility li.nav-current > a {
+  color: var(--link);
+  border-bottom: 1px solid var(--link);
+}
+
+.nav-preview {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.nav-preview li {
+  margin-bottom: 0.3rem;
+}
+
+.nav-preview a {
+  font-size: 0.78rem;
+  color: var(--ink);
+  border: none;
+  line-height: 1.4;
+}
+
+.nav-preview a:hover {
+  border-bottom: 1px solid var(--ink);
+}
+
+.nav-utility {
+  list-style: none;
+  margin: 1.75rem 0 0;
+  padding: 1.25rem 0 0;
+}
+
+.nav-utility li {
+  margin-bottom: 0.55rem;
+}
+
+.nav-utility a {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  font-size: 0.95rem;
+  border: none;
+}
+
+.nav-utility a:hover {
+  border-bottom: 1px solid var(--ink);
+}
+
+/* ---------------------------------------------------
+   Index lists: home, category pages, latest, archive
+--------------------------------------------------- */
+
+.page-intro {
+  max-width: var(--max);
+  margin-bottom: 2.5rem;
+}
+
+.page-intro p {
+  margin: 0 0 1rem;
+}
+
+.index-heading {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  font-size: 1.5rem;
+  margin: 0 0 0.3rem;
+  font-weight: 600;
+}
+
+.index-count {
+  color: var(--ink);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 0 0 1.5rem;
+}
+
+.index-subheading {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 2.5rem 0 0.3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ink);
+  max-width: 560px;
+}
+
+/* A contained, internally-scrolling post list — opt in per page with
+   `scroll_list: true` (used on /archive/, where the full-history list
+   can otherwise run very long). */
+
+.index-scroll {
+  max-height: 60vh;
+  overflow-y: auto;
+  max-width: 560px;
+  border-top: 1px solid var(--ink);
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+
+.index-scroll .index-list {
+  max-width: none;
+}
+
+.index-scroll .index-row:first-child {
+  border-top: none;
+}
+
+.index-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.index-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.index-scroll::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 3px;
+}
+
+.index-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Photos subsection — a dump of every image asset, grouped by year
+   into native <details> dropdowns. */
+
+.photo-year {
+  border-bottom: 1px solid var(--ink);
+}
+
+.photo-year:first-of-type {
+  border-top: 1px solid var(--ink);
+}
+
+.photo-year summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.75rem 0;
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.photo-year summary::-webkit-details-marker {
+  display: none;
+}
+
+.photo-year summary::before {
+  content: "+";
+  display: inline-block;
+  width: 0.8em;
+  color: var(--ink);
+  font-weight: 400;
+}
+
+.photo-year[open] summary::before {
+  content: "\2212";
+}
+
+.photo-year-count {
+  font-variant: normal;
+  letter-spacing: normal;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  max-width: var(--max-wide);
+  padding: 0 0 1.5rem;
+}
+
+.photo-grid-item {
+  flex: 0 0 auto;
+  width: 140px;
+  height: 140px;
+  border: none;
+}
+
+.photo-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .photo-grid-item {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* Lightbox — opens a clicked photo in an overlay on the same page. */
+
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: rgba(28, 27, 25, 0.92);
+}
+
+.lightbox:not([hidden]) {
+  display: flex;
+}
+
+.lightbox-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.lightbox-close {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.75rem;
+  border: none;
+  background: none;
+  /* Always light — the lightbox scrim is a fixed dark overlay
+     regardless of site theme, so this can't follow --bg (which
+     flips dark in night mode and would vanish against it). */
+  color: #f7f6f2;
+  font-family: var(--serif);
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.lightbox-close:hover {
+  opacity: 0.7;
+}
+
+.index-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 560px;
+}
+
+.index-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--ink);
+}
+
+.index-row:first-child {
+  border-top: 1px solid var(--ink);
+}
+
+.index-title {
+  border: none;
+  font-size: 0.98rem;
+}
+
+.index-title:hover {
+  border-bottom: 1px solid var(--ink);
+}
+
+.index-date {
+  color: var(--ink);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.empty {
+  color: var(--ink);
+  font-style: italic;
+  padding: 1.5rem 0;
+}
+
+/* ---------------------------------------------------
+   Prev/next (older/newer post in the same category)
+--------------------------------------------------- */
+
+.prev-next {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+.prev-next-link {
+  border: none;
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+  max-width: 48%;
+}
+
+.prev-next-older {
+  text-align: right;
+}
+
+.prev-next-link:hover {
+  border-bottom: 1px solid var(--ink);
+}
+
+/* ---------------------------------------------------
+   Article
+--------------------------------------------------- */
+
+.article-header {
+  margin-bottom: 2.25rem;
+  max-width: var(--max);
+}
+
+.article-date {
+  color: var(--ink);
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.article-category {
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+}
+
+.article-category a {
+  color: var(--ink);
+  border-bottom: 1px solid transparent;
+}
+
+.article-category a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.article-title {
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+  font-size: 1.7rem;
+  line-height: 1.3;
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.article-title a {
+  border: none;
+  color: inherit;
+}
+
+.article-title a:hover {
+  border-bottom: 1px solid var(--ink);
+}
+
+/* Divider between full posts stacked back to back, e.g. /latest/ */
+
+.feed-divider {
+  border: none;
+  border-top: 1px solid var(--ink);
+  margin: 4.5rem 0;
+}
+
+.article-byline {
+  font-style: italic;
+  color: var(--ink);
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.content-main > p,
+.content-main > ul,
+.content-main > ol,
+.content-main > blockquote,
+.content-main > h2,
+.content-main > h3 {
+  max-width: 700px;
+}
+
+/* ---------------------------------------------------
+   Sidenotes: write them with kramdown footnote syntax
+   (some text[^1] ... [^1]: the note). That gives you a
+   numbered, linked marker in the text for free, and
+   kramdown collects the notes into a ".footnotes" list
+   at the end of the content. The post layout splits
+   that list out of the content into its own element
+   (see _includes/post-body.html) so it can sit in a column
+   of its own — a single grid item next to a single grid
+   item for everything else, rather than spanning across
+   one grid row per paragraph, which is what caused stray
+   whitespace between paragraphs in an earlier version of
+   this. When a post has no notes, .article-content never
+   gets the has-sidenotes class and stays a plain block.
+
+   The notes actually render TWICE: this sidenotes column
+   (.sidenotes-copy) is a display-only duplicate, and the
+   real, linked-to list is a second copy further down the
+   page (.footnotes-bottom, styled below). See the comment
+   at the top of post-body.html for why.
+--------------------------------------------------- */
+
+.article-content.has-sidenotes {
+  display: grid;
+  grid-template-columns: minmax(0, 700px) minmax(0, 280px);
+  column-gap: 6.5rem;
+  align-items: start;
+}
+
+.content-main {
+  min-width: 0;
+}
+
+.article-content .footnotes {
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+/* On wide screens, each note is pulled out of normal flow and placed
+   beside its own reference marker in the text (true margin notes,
+   rather than one block of notes together) — see the script at the
+   bottom of post-body.html for the actual positioning, which needs
+   to measure rendered marker positions and so can't be done in CSS
+   alone. This just sets up the positioning context: .footnotes-list
+   becomes the containing block, each <li> is placed with `top` in a
+   inline style set by that script. Scoped to the same breakpoint as
+   the grid layout itself, so it never applies below, where the
+   sidenotes copy is hidden entirely instead (see next rule). */
+@media (min-width: 901px) {
+  .article-content .footnotes ol {
+    position: relative;
+  }
+}
+
+@media (max-width: 900px) {
+  .article-content.has-sidenotes {
+    display: block;
+  }
+
+  /* No room for a side column here, and .footnotes-bottom (below) is
+     already showing the same notes as a plain list — so rather than
+     also stacking this copy into view (which would just show every
+     note twice, back to back), it's hidden outright at this width. */
+  .sidenotes-copy {
+    display: none;
+  }
+}
+
+/* The real notes list — every in-text marker link (href="#fn:...")
+   points here, not at the sidenotes column above, which is why this
+   one keeps kramdown's original "fn:" ids (see post-body.html) rather
+   than the "sidefn:" ids used for display in the sidenotes copy.
+   Always visible, at every width, as a plain list below the article —
+   the sidenotes column is the one that comes and goes with screen
+   width, not this one. */
+.footnotes-bottom {
+  max-width: 700px;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ink);
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+/* The older/newer-in-category nav (prev-next.html) reuses the exact
+   same markup at the top and bottom of a post — this only matches the
+   copy that directly follows the footnotes list, giving it its own
+   rule and extra breathing room so it doesn't read as one more line
+   tacked onto the notes above it. */
+.footnotes-bottom + .prev-next {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ink);
+}
+
+/* The small numbered marker in the text that a footnote hangs off of —
+   same blue as every other link in a post, no underline, and a touch
+   larger than a typical superscript so it reads clearly on its own.
+   (Note: kramdown actually nests this the other way round,
+   <sup id="fnref:N"><a class="footnote">N</a></sup> — so this rule
+   targets the a.footnote directly rather than a nested "sup", which
+   here would never match anything.) */
+.article-content a.footnote {
+  font-size: 0.95em;
+  vertical-align: super;
+  margin-left: 0.1em;
+  color: var(--link);
+  border-bottom: none;
+  border-radius: 2px;
+  padding: 0.05em 0.2em;
+}
+
+.article-content a.footnote:hover {
+  color: var(--bg);
+  background-color: var(--link-hover);
+}
+
+.footnotes ol {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.footnotes li {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.footnotes li p {
+  margin: 0;
+  display: inline;
+}
+
+/* Every link inside a footnote — the links in the note's own text, and
+   the reversefootnote "return to text" arrow at the end of it — gets
+   the same more-visible blue treatment as links in the article body;
+   see ".article-content a:not(.footnote)" below for why blue. */
+.footnotes a {
+  color: var(--link);
+  border-bottom: 1px solid var(--link);
+  border-radius: 2px;
+  padding: 0.05em 0.25em;
+  margin: -0.05em -0.25em;
+}
+
+.footnotes a:hover {
+  color: var(--bg);
+  background-color: var(--link-hover);
+  border-bottom-color: transparent;
+}
+
+.footnotes .reversefootnote {
+  margin-left: 0.35em;
+  font-size: 0.9em;
+}
+
+/* The sidenotes copy is display-only (see post-body.html) — its own
+   "return to text" arrow is redundant right next to the text it's
+   already sitting beside, so it's hidden there. The real footnotes
+   list at the bottom of the post keeps its arrow untouched. */
+.sidenotes-copy .reversefootnote {
+  display: none;
+}
+
+.article-content h2 {
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+  font-size: 1.25rem;
+  margin-top: 2.5rem;
+  font-weight: 600;
+}
+
+.article-content h3 {
+  font-size: 1.05rem;
+  margin-top: 2rem;
+  font-weight: 600;
+}
+
+.article-content p,
+.article-content ul,
+.article-content ol,
+.article-content blockquote {
+  margin: 1.1rem 0;
+}
+
+/* Ordinary links in the body text of a post — as opposed to a
+   ".footnote" marker link (the small numbered superscript), which
+   keeps its own separate, deliberately quieter styling above and is
+   excluded here with :not() rather than relying on source order to
+   win, since both rules share the same ".article-content a..."
+   specificity. Blue and a clearer hover state make these links read
+   as more distinctly clickable than the site's plain-ink links
+   elsewhere (nav, index lists) — a deliberate contrast, post content
+   only. */
+.article-content a:not(.footnote) {
+  color: var(--link);
+  border-bottom: 1px solid var(--link);
+  border-radius: 2px;
+  padding: 0.05em 0.25em;
+  margin: -0.05em -0.25em;
+}
+
+.article-content a:not(.footnote):hover {
+  color: var(--bg);
+  background-color: var(--link-hover);
+  border-bottom-color: transparent;
+}
+
+.article-content img {
+  max-width: 100%;
+  display: block;
+  margin: 2rem 0;
+}
+
+.article-content blockquote {
+  border-left: 2px solid var(--ink);
+  padding-left: 1rem;
+  color: var(--ink);
+  font-style: italic;
+}
+
+.article-content code {
+  background: var(--line);
+  padding: 0.1em 0.35em;
+  font-size: 0.9em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.article-content pre {
+  background: #efece3;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.article-content pre code {
+  background: none;
+  padding: 0;
+}
+
+/* ---------------------------------------------------
+   Rows: side-by-side images and text, no float, no wrap.
+   Wrap a block in <div class="row" markdown="1">, size
+   each direct child with a col-* class, and — if the
+   row doesn't fill the width — position it with
+   justify-center / justify-right (left is the default).
+--------------------------------------------------- */
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 2rem;
+  margin: 2.5rem 0;
+}
+
+.row.justify-center {
+  justify-content: center;
+}
+
+.row.justify-right {
+  justify-content: flex-end;
+}
+
+.row > img,
+.row > p,
+.row > div {
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.row > img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.row > .col-quarter {
+  flex: 0 1 25%;
+}
+
+.row > .col-third {
+  flex: 0 1 33.333%;
+}
+
+.row > .col-half {
+  flex: 0 1 50%;
+}
+
+.row > .col-two-thirds {
+  flex: 0 1 66.666%;
+}
+
+.row > .col-full {
+  flex: 0 1 100%;
+}
+
+@media (max-width: 720px) {
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .row > * {
+    flex-basis: 100% !important;
+  }
+}
+
+/* Standalone image sizes (no row needed) */
+
+.article-content img.img-small {
+  width: 30%;
+}
+
+.article-content img.img-medium {
+  width: 50%;
+}
+
+.article-content img.img-large {
+  width: 75%;
+}
+
+.article-content img.img-full {
+  width: 100%;
+  max-width: var(--max-wide);
+}
+
+.article-content img.img-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Text alignment */
+
+.article-content .text-left {
+  text-align: left;
+}
+
+.article-content .text-right {
+  text-align: right;
+}
+
+.article-content .text-center {
+  text-align: center;
+}
+
+/* ---------------------------------------------------
+   Post hero image (optional, any post can have one)
+--------------------------------------------------- */
+
+.post-hero {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 0 0.75rem;
+}
+
+.post-hero-caption {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-style: italic;
+  margin: 0 0 2rem;
+  max-width: 700px;
+}
+
+/* ---------------------------------------------------
+   Plain pages (About, Library)
+--------------------------------------------------- */
+
+.page-title {
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+  font-size: 1.5rem;
+  margin: 0 0 1.5rem;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------
+   Landing page (site root) — title, plain navbar, cover
+   image, everything centered. Standalone template, does
+   not use the sidebar shell from default.html.
+--------------------------------------------------- */
+
+.landing-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 2rem 1.5rem;
+}
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 640px;
+  width: 100%;
+}
+
+.landing-title {
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+  font-size: 3.75rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+}
+
+.landing-nav ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  font-variant: small-caps;
+  letter-spacing: 0.02em;
+  font-size: 0.95rem;
+}
+
+.landing-nav a {
+  border-bottom: 1px solid transparent;
+}
+
+.landing-nav a:hover {
+  border-bottom-color: var(--ink);
+}
+
+.landing-cover {
+  max-width: 100%;
+  max-height: 60vh;
+  width: auto;
+  height: auto;
+  display: block;
+}
