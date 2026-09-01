@@ -2,9 +2,14 @@
 layout: default
 ---
 {% if page.category %}
-  {% assign entries = site.posts | where: "category", page.category | sort: "date" | reverse %}
+  {% assign entries = site.posts | where: "category", page.category %}
 {% else %}
-  {% assign entries = site.posts | sort: "date" | reverse %}
+  {% assign entries = site.posts %}
+{% endif %}
+{% if page.sort_by == "title" %}
+  {% assign entries = entries | sort: "title" %}
+{% else %}
+  {% assign entries = entries | sort: "date" | reverse %}
 {% endif %}
 {% if page.limit %}
   {% assign entries = entries | slice: 0, page.limit %}
