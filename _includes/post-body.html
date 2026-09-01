@@ -44,9 +44,11 @@
   {% endfor %}
   <header class="article-header">
     <div class="article-date">
-      {{ p.date | date: "%d %b %Y" }}
+      {% unless p.category == "recipes" %}
+        {{ p.date | date: "%d %b %Y" }}
+      {% endunless %}
       {% if p.category %}
-        <span class="article-category">&middot; <a href="{{ '/' | append: p.category | append: '-index/' | relative_url }}">{{ category_title }}</a></span>
+        <span class="article-category">{% unless p.category == "recipes" %}&middot; {% endunless %}<a href="{{ '/' | append: p.category | append: '-index/' | relative_url }}">{{ category_title }}</a></span>
       {% endif %}
     </div>
     <h1 class="article-title"><a href="{{ p.url | relative_url }}">{{ p.title | default: p.caption | default: "Untitled" }}</a></h1>

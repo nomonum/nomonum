@@ -6,7 +6,9 @@
     {% for entry in entries %}
       <li class="index-row">
         <a class="index-title" href="{{ entry.url | relative_url }}">{{ entry.title | default: entry.caption | default: "Untitled" }}</a>
-        <span class="index-date">{{ entry.date | date: "%d %b %Y" }}</span>
+        {% unless entry.category == "recipes" %}
+          <span class="index-date">{{ entry.date | date: "%d %b %Y" }}</span>
+        {% endunless %}
       </li>
     {% endfor %}
   </ul>
