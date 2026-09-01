@@ -1,7 +1,13 @@
 ---
 layout: default
 ---
-{% assign entries = site.posts | sort: "date" | reverse %}
+{% comment %}
+  Recipes are excluded: this page is capped to the 10 most recent
+  posts site-wide, and the 52 recipes (backdated to Jun/Jul 2026)
+  would otherwise crowd out every other category. They're still
+  browsable at /recipes-index/ and in the full /archive/.
+{% endcomment %}
+{% assign entries = site.posts | where_exp: "p", "p.category != 'recipes'" | sort: "date" | reverse %}
 {% if page.limit %}
   {% assign entries = entries | slice: 0, page.limit %}
 {% endif %}
