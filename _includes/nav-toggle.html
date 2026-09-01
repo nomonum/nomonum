@@ -1,26 +1,72 @@
 <button type="button" id="nav-toggle" class="nav-toggle" aria-label="Hide navigation">&laquo;</button>
+<div id="nav-backdrop" class="nav-backdrop" hidden></div>
 <script>
   (function () {
     var btn = document.getElementById('nav-toggle');
     if (!btn) return;
     var root = document.documentElement;
+    var backdrop = document.getElementById('nav-backdrop');
+    // Below this width the nav is an off-canvas drawer (see style.css)
+    // instead of a sidebar, so the same button drives a different,
+    // non-persisted open/closed state rather than the desktop
+    // reading-mode toggle below.
+    var mobileMql = window.matchMedia('(max-width: 780px)');
 
     function isHidden() {
       return root.classList.contains('nav-hidden');
     }
 
+    function isMobileOpen() {
+      return root.classList.contains('mobile-nav-open');
+    }
+
+    function isOpen() {
+      return mobileMql.matches ? isMobileOpen() : !isHidden();
+    }
+
+    function closeMobile() {
+      root.classList.remove('mobile-nav-open');
+    }
+
     function updateButton() {
-      var hidden = isHidden();
-      btn.innerHTML = hidden ? '&raquo;' : '&laquo;';
-      btn.setAttribute('aria-label', hidden ? 'Show navigation' : 'Hide navigation');
+      var open = isOpen();
+      btn.innerHTML = open ? '&laquo;' : '&raquo;';
+      btn.setAttribute('aria-label', open ? 'Hide navigation' : 'Show navigation');
+      if (backdrop) backdrop.hidden = !(mobileMql.matches && open);
     }
 
     btn.addEventListener('click', function () {
-      var next = !isHidden();
-      root.classList.toggle('nav-hidden', next);
-      try {
-        localStorage.setItem('nomonum-nav-hidden', next ? 'true' : 'false');
-      } catch (e) {}
+      if (mobileMql.matches) {
+        root.classList.toggle('mobile-nav-open');
+      } else {
+        var next = !isHidden();
+        root.classList.toggle('nav-hidden', next);
+        try {
+          localStorage.setItem('nomonum-nav-hidden', next ? 'true' : 'false');
+        } catch (e) {}
+      }
+      updateButton();
+    });
+
+    if (backdrop) {
+      backdrop.addEventListener('click', function () {
+        closeMobile();
+        updateButton();
+      });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isMobileOpen()) {
+        closeMobile();
+        updateButton();
+      }
+    });
+
+    // Crossing the breakpoint (e.g. rotating a tablet) shouldn't leave
+    // a stale open drawer behind once the layout switches to the
+    // sidebar, so drop the mobile-only state whenever this changes.
+    mobileMql.addEventListener('change', function () {
+      closeMobile();
       updateButton();
     });
 
