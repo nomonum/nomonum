@@ -9,6 +9,10 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  # Needed only so configure-pages (below) can enable the Pages site
+  # itself on the first run, in case the repo's Settings > Pages UI
+  # wasn't (or couldn't be) switched to "GitHub Actions" beforehand.
+  administration: write
 
 concurrency:
   group: "pages"
@@ -28,6 +32,8 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
