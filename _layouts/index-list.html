@@ -4,7 +4,14 @@ layout: default
 {% if page.category %}
   {% assign entries = site.posts | where: "category", page.category %}
 {% else %}
-  {% assign entries = site.posts %}
+  {% comment %}
+    No category means this is the "everything" view (currently just
+    /archive/). Recipes are excluded here too, same reasoning as
+    /latest/ (_layouts/feed.html): 52 of them would swamp the rest of
+    the site's history in one chronological list. Still browsable at
+    /recipes-index/.
+  {% endcomment %}
+  {% assign entries = site.posts | where_exp: "p", "p.category != 'recipes'" %}
 {% endif %}
 {% if page.sort_by == "title" %}
   {% assign entries = entries | sort: "title" %}
