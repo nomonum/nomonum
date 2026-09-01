@@ -12,7 +12,9 @@ email: ""
 # list. Renaming a category is a two-step edit: change the "title" here
 # (this is the only place the display name lives), and rename the matching
 # *-index.markdown file's "category" front matter value if you also change
-# the slug. Reorder this list to reorder the sidebar.
+# the slug. Reorder this list to reorder the sidebar. Set "show_preview:
+# false" on an entry to hide its recent-posts preview under the sidebar
+# link (e.g. recipes, where the list is too long to usefully preview).
 nav_categories:
   - slug: informatics
     title: Informatics
@@ -22,6 +24,7 @@ nav_categories:
     title: Notes
   - slug: recipes
     title: Recipes
+    show_preview: false
 
 # How many recent items to preview under each category in the sidebar.
 nav_preview_count: 3
