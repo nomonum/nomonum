@@ -20,14 +20,19 @@
    choice via the toggle button (_includes/theme-toggle.html), which
    sets data-theme on <html> and overrides the system preference either
    way. See _includes/theme-init.html for how that choice is restored
-   on load without a flash of the wrong theme. */
+   on load without a flash of the wrong theme.
+   --bg is a near-black, not pure #000: true black under this thin
+   serif body copy read as washed-out/glary despite passing contrast
+   math, and it also fought the palette's warm undertone. --muted is
+   nudged lighter for the same reason — it's used for small secondary
+   text (dates, captions) where dimness reads as low-contrast fastest. */
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ink: #ece8e0;
-    --muted: #94897a;
+    --muted: #a89e8f;
     --line: #37332c;
-    --bg: #000000;
+    --bg: #121110;
     --link: #6ea8fe;
     --link-hover: #9dc1ff;
   }
