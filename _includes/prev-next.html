@@ -1,4 +1,15 @@
-{% assign cat_items = site.posts | where: "category", page.category | sort: "date" | reverse %}
+{% comment %}
+  Order matches each category's own index page (see _layouts/index-list.html):
+  recipes browse alphabetically by title there, everything else by date,
+  newest first — so "prev/next" here has to follow the same rule per
+  category, or the links would walk a different order than the index
+  the reader arrived from.
+{% endcomment %}
+{% if page.category == "recipes" %}
+  {% assign cat_items = site.posts | where: "category", page.category | sort: "title" %}
+{% else %}
+  {% assign cat_items = site.posts | where: "category", page.category | sort: "date" | reverse %}
+{% endif %}
 {% assign newer = nil %}
 {% assign older = nil %}
 {% assign found = false %}
