@@ -1,6 +1,8 @@
 ---
 title: "Sunday Photo Dump"
 category: notes
+image: /assets/images/DSC01466.JPG
+caption: "A hand-painted sign beside a pond quoting Acts 8:36: \"Please don't die lost. See here is water...\""
 ---
 
 ![A white door set into a weathered red brick building, with old utility meters and pipes running down the wall](/assets/images/DSC01307.JPG){: .img-full .img-center}
@@ -14,8 +16,6 @@ category: notes
 ![A roadside wooden cross sign reading "House of Worship, Sun 10 AM"](/assets/images/DSC01436.JPG){: .img-full .img-center}
 
 ![A yellow excavator parked on a grassy embankment under a large cumulus cloud](/assets/images/DSC01447.JPG){: .img-full .img-center}
-
-![A hand-painted sign beside a pond quoting Acts 8:36 and reading "Please don't die lost. See here is water..."](/assets/images/DSC01457.JPG){: .img-full .img-center}
 
 ![A white church steeple topped with a cross, against a blue sky with clouds](/assets/images/DSC01484.JPG){: .img-full .img-center}
 
